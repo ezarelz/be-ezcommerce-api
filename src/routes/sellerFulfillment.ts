@@ -106,6 +106,8 @@ router.get(
             select: {
               id: true,
               createdAt: true,
+              address: true,
+              shipping: true,
               status: true,
               user: { select: { id: true, name: true, email: true } },
             },
@@ -294,7 +296,9 @@ router.patch(
  * /api/seller-fulfillment/order-items/{id}/deliver:
  *   patch:
  *     summary: Mark an order item as delivered (seller action)
- *     description: Shortcut endpoint for marking an order item as DELIVERED.
+ *     description:
+ *       Seller marks an order item as DELIVERED (shipped).
+ *       Buyer will later confirm receipt to mark it as COMPLETED.
  *     tags: [Seller Fulfillment]
  *     security:
  *       - bearerAuth: []
@@ -307,11 +311,13 @@ router.patch(
  *           example: 7
  *     responses:
  *       200:
- *         description: Item marked as delivered
+ *         description: Item marked as delivered successfully
  *       400:
- *         description: Invalid transition (only PENDING → DELIVERED allowed)
+ *         description: Invalid transition (only PENDING → DELIVERED allowed, or already delivered)
  *       404:
  *         description: Item not found
+ *       500:
+ *         description: Internal Server Error
  */
 router.patch(
   '/order-items/:id/deliver',
@@ -326,31 +332,44 @@ router.patch(
       });
 
       if (!item) {
-        return res
-          .status(404)
-          .json({ success: false, message: 'Order item not found' });
-      }
-
-      if (item.status !== OrderItemStatus.PENDING) {
-        return res.status(400).json({
+        return res.status(404).json({
           success: false,
-          message: 'Invalid transition. Only PENDING → DELIVERED allowed',
+          message: 'Order item not found',
         });
       }
 
+      // 🟡 prevent double deliver
+      if (item.status === OrderItemStatus.DELIVERED) {
+        return res.status(400).json({
+          success: false,
+          message: 'Item already marked as DELIVERED',
+          data: item,
+        });
+      }
+
+      // 🚫 prevent invalid transition
+      if (item.status !== OrderItemStatus.PENDING) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid transition. Current status: ${item.status}. Only PENDING → DELIVERED allowed.`,
+          data: item,
+        });
+      }
+
+      // ✅ update to DELIVERED
       const updated = await prisma.orderItem.update({
         where: { id },
         data: { status: OrderItemStatus.DELIVERED },
       });
 
-      res.json({
+      return res.json({
         success: true,
-        message: 'Order item marked as delivered',
+        message: 'Order item marked as DELIVERED',
         data: updated,
       });
     } catch (err) {
       console.error('Deliver error:', err);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Internal Server Error',
       });

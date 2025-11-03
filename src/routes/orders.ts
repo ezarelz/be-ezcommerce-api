@@ -454,35 +454,40 @@ router.patch(
   async (req: AuthedRequest, res: Response) => {
     try {
       const id = toInt(req.params.id);
+
       const item = await prisma.orderItem.findUnique({
         where: { id },
         include: { order: { include: { items: true } } },
       });
 
+      // pastikan item ada dan milik user yg login
       if (!item || item.order.userId !== req.user!.userId) {
-        res
+        return res
           .status(404)
           .json({ success: false, message: 'Order item not found' });
-        return;
-      }
-      if (item.status !== 'PENDING') {
-        res
-          .status(403)
-          .json({ success: false, message: 'Invalid status transition' });
-        return;
       }
 
-      // update item
+      // ✅ hanya izinkan dari DELIVERED ke COMPLETED
+      if (item.status !== 'DELIVERED') {
+        return res.status(403).json({
+          success: false,
+          message: 'Invalid transition. Only DELIVERED → COMPLETED allowed',
+        });
+      }
+
+      // update item ke COMPLETED
       const updated = await prisma.orderItem.update({
         where: { id },
         data: { status: 'COMPLETED' },
       });
 
-      // jika semua item completed → order completed
-      const stillPending = item.order.items.some(
-        (oi) => oi.id !== id && oi.status !== 'COMPLETED'
+      // cek apakah semua item di order ini sudah COMPLETED
+      const allCompleted = item.order.items.every((oi) =>
+        oi.id === id ? true : oi.status === 'COMPLETED'
       );
-      if (!stillPending) {
+
+      // kalau semua item completed → update order.status juga
+      if (allCompleted) {
         await prisma.order.update({
           where: { id: item.orderId },
           data: { status: 'COMPLETED' },
@@ -494,7 +499,8 @@ router.patch(
         message: 'Order item marked as completed',
         data: updated,
       });
-    } catch {
+    } catch (err) {
+      console.error('Complete item error:', err);
       res
         .status(500)
         .json({ success: false, message: 'Internal Server Error' });
