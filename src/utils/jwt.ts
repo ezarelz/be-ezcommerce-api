@@ -1,5 +1,6 @@
 // src/utils/jwt.ts
 import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
+import { CustomJwtPayload } from '../types/jwt';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
 
@@ -19,10 +20,8 @@ export function signToken<T extends object>(
   return jwt.sign(payload, JWT_SECRET, options);
 }
 
-/** Verify token → payload atau null (tanpa melempar) */
-export function verifyToken<T extends JwtPayload | string>(
-  token: string
-): T | null {
+/** Verify token → payload atau null (tanpa melempar error) */
+export function verifyToken<T extends JwtPayload>(token: string): T | null {
   try {
     return jwt.verify(token, JWT_SECRET) as T;
   } catch {
@@ -35,4 +34,9 @@ export function extractToken(header?: string): string | null {
   if (!header) return null;
   const [scheme, token] = header.split(' ');
   return scheme === 'Bearer' && token ? token : null;
+}
+
+/** Shortcut khusus kalau payload kamu adalah CustomJwtPayload */
+export function verifyUserToken(token: string): CustomJwtPayload | null {
+  return verifyToken<CustomJwtPayload>(token);
 }

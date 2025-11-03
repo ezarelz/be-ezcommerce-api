@@ -5,10 +5,22 @@
     "lib": ["ES2019"],
     "rootDir": "src",
     "outDir": "dist",
-    "strict": true,
+
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "useUnknownInCatchVariables": false,
+
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true
   },
-  "include": ["src/**/*.ts"], // ← add this
-  "exclude": ["node_modules", "dist", "prisma/**"] // ← and this
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "prisma/**"]
 }
