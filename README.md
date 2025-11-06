@@ -116,6 +116,5 @@ This project is licensed under the **MIT License** — feel free to use and modi
 
 ### ✨ Author
 
-update
 **Manggala Eleazar (Ezar)**
 🌍 [https://github.com/ezarelz](https://github.com/ezarelz)
