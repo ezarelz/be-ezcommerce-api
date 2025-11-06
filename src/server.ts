@@ -31,7 +31,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const SERVER_URL =
   process.env.SERVER_URL ||
   (NODE_ENV === 'production'
-    ? `https://your-railway-backend.up.railway.app`
+    ? `https://be-ezcommerce-api-production.up.railway.app/`
     : `http://localhost:${PORT}`);
 
 const FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN || '*';
