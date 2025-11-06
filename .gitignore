@@ -1,34 +1,37 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
-node_modules
-/.pnp
+node_modules/
+.pnp/
 .pnp.js
-package-lock.json
 
-# testing
-/coverage
+# compiled output
+/dist/
+build/
 
-# production
-/build
+# environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# misc
-.DS_Store
-
-# Logs
+# logs
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# dotenv environment variables file
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-config/keys.js
+# editor and system files
+.DS_Store
+Thumbs.db
+*.swp
 
-# Optional eslint cache
-.eslintcache
+# testing
+coverage/
+
+# prisma artifacts
+prisma/dev.db
+prisma/migrations/*/README.md
+
+# Docker artifacts (optional)
+docker-data/
