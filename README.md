@@ -117,5 +117,4 @@ This project is licensed under the **MIT License** — feel free to use and modi
 ### ✨ Author
 
 **Manggala Eleazar (Ezar)**
-📧 [[your.email@example.com](mailto:your.email@example.com)]
-🌍 [https://github.com/ezar-eleazar](https://github.com/ezar-eleazar)
+🌍 [https://github.com/ezarelz](https://github.com/ezarelz)
