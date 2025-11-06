@@ -31,9 +31,11 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const SERVER_URL =
   process.env.SERVER_URL ||
   (NODE_ENV === 'production'
-    ? `https://be-ezcommerce-api-production.up.railway.app/`
+    ? `https://${
+        process.env.RAILWAY_STATIC_URL ||
+        'be-ezcommerce-api-production.up.railway.app'
+      }`
     : `http://localhost:${PORT}`);
-
 const FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN || '*';
 
 // ===== Middlewares =====
